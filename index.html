@@ -45,9 +45,9 @@ user-select:none;
 
 .name{
 position:absolute;
-top:50%;
+top:10px;
 left:50%;
-transform:translate(-50%,-50%);
+transform:translateX(-50%);
 font-size:5vh;
 font-weight:bold;
 color:white;
@@ -55,6 +55,10 @@ pointer-events:none;
 }
 
 .nameInput{
+position:absolute;
+top:10px;
+left:50%;
+transform:translateX(-50%);
 font-size:5vh;
 border:none;
 padding:5px;
@@ -93,6 +97,7 @@ color:white;
 .sets{
 position:absolute;
 bottom:10px;
+left:10px;
 display:flex;
 gap:10px;
 }
@@ -236,23 +241,19 @@ removePoint("B")
 })
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
-
 if(confirm("¿Reiniciar marcador?")){
 scoreA=0
 scoreB=0
 update()
 }
-
 })
 
 function toggleFullscreen(){
-
 if(!document.fullscreenElement){
 document.documentElement.requestFullscreen()
 }else{
 document.exitFullscreen()
 }
-
 }
 
 function editName(team,e){
