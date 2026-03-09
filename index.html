@@ -14,8 +14,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Marcador Voley">
 
-</head>
-
 <style>
 
 html,body{
@@ -55,11 +53,30 @@ user-select:none;
 .name{
 position:absolute;
 top:12px;
-right:15px;
+right:60px;
 font-size:4vh;
 font-weight:bold;
 color:white;
 }
+
+.nameInput{
+font-size:4vh;
+font-weight:bold;
+border:none;
+background:rgba(255,255,255,0.9);
+border-radius:6px;
+padding:2px 6px;
+}
+
+.icon{
+position:absolute;
+top:10px;
+font-size:3vh;
+cursor:pointer;
+}
+
+.edit{ right:15px; }
+.color{ right:45px; }
 
 .score{
 font-size:42vh;
@@ -93,6 +110,26 @@ font-size:18px;
 padding:8px 12px;
 }
 
+.palette{
+position:absolute;
+top:50px;
+right:10px;
+display:grid;
+grid-template-columns:repeat(4,30px);
+gap:6px;
+background:white;
+padding:8px;
+border-radius:8px;
+box-shadow:0 0 8px rgba(0,0,0,0.3);
+}
+
+.colorBox{
+width:30px;
+height:30px;
+border-radius:4px;
+cursor:pointer;
+}
+
 </style>
 </head>
 
@@ -101,15 +138,29 @@ padding:8px 12px;
 <div class="container">
 
 <div class="team top" id="teamA">
+
 <button class="minus" id="minusA">-1</button>
-<div class="name">San José</div>
+
+<div class="icon color" onclick="togglePalette('A',event)">🎨</div>
+<div class="icon edit" onclick="editName('A',event)">✏️</div>
+
+<div class="name" id="nameA">San José</div>
+
 <div class="score" id="scoreA">0</div>
+
 </div>
 
 <div class="team bottom" id="teamB">
+
 <button class="minus" id="minusB">-1</button>
-<div class="name">Rival</div>
+
+<div class="icon color" onclick="togglePalette('B',event)">🎨</div>
+<div class="icon edit" onclick="editName('B',event)">✏️</div>
+
+<div class="name" id="nameB">Rival</div>
+
 <div class="score" id="scoreB">0</div>
+
 </div>
 
 </div>
@@ -124,18 +175,26 @@ padding:8px 12px;
 let scoreA = parseInt(localStorage.getItem('scoreA')) || 0
 let scoreB = parseInt(localStorage.getItem('scoreB')) || 0
 
+let colors = [
+"#e53935","#1e88e5","#43a047","#fdd835",
+"#8e24aa","#fb8c00","#00acc1","#546e7a"
+]
+
 function update(){
 
 scoreA=Math.max(0,scoreA)
 scoreB=Math.max(0,scoreB)
 
-document.getElementById("scoreA").textContent=scoreA
-document.getElementById("scoreB").textContent=scoreB
+scoreAEl.textContent=scoreA
+scoreBEl.textContent=scoreB
 
 localStorage.setItem("scoreA",scoreA)
 localStorage.setItem("scoreB",scoreB)
 
 }
+
+let scoreAEl=document.getElementById("scoreA")
+let scoreBEl=document.getElementById("scoreB")
 
 function addPoint(team){
 if(team==="A") scoreA++
@@ -163,25 +222,106 @@ removePoint("B")
 })
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
-
 if(confirm("¿Reiniciar marcador?")){
 scoreA=0
 scoreB=0
 update()
 }
-
 })
 
 function toggleFullscreen(){
-
 if(!document.fullscreenElement){
 document.documentElement.requestFullscreen()
 }else{
 document.exitFullscreen()
 }
+}
+
+function editName(team,e){
+
+e.stopPropagation()
+
+let nameEl=document.getElementById("name"+team)
+
+if(nameEl.tagName==="INPUT"){
+
+let newName=nameEl.value
+
+let div=document.createElement("div")
+div.className="name"
+div.id="name"+team
+div.textContent=newName
+
+nameEl.replaceWith(div)
+
+localStorage.setItem("team"+team+"Name",newName)
+
+}else{
+
+let input=document.createElement("input")
+input.className="nameInput"
+input.id="name"+team
+input.value=nameEl.textContent
+
+nameEl.replaceWith(input)
+input.focus()
 
 }
 
+}
+
+function togglePalette(team,e){
+
+e.stopPropagation()
+
+let existing=document.querySelector(".palette")
+if(existing) existing.remove()
+
+let palette=document.createElement("div")
+palette.className="palette"
+
+colors.forEach(c=>{
+
+let box=document.createElement("div")
+box.className="colorBox"
+box.style.background=c
+
+box.onclick=(ev)=>{
+
+ev.stopPropagation()
+
+document.getElementById("team"+team).style.background=c
+localStorage.setItem("team"+team+"Color",c)
+
+palette.remove()
+
+}
+
+palette.appendChild(box)
+
+})
+
+document.getElementById("team"+team).appendChild(palette)
+
+}
+
+function loadSettings(){
+
+let nameA=localStorage.getItem("teamAName")
+let nameB=localStorage.getItem("teamBName")
+
+if(nameA) document.getElementById("nameA").textContent=nameA
+if(nameB) document.getElementById("nameB").textContent=nameB
+
+let colorA=localStorage.getItem("teamAColor")
+let colorB=localStorage.getItem("teamBColor")
+
+if(colorA) document.getElementById("teamA").style.background=colorA
+if(colorB) document.getElementById("teamB").style.background=colorB
+
+}
+
+loadSettings()
 update()
 
 </script>
