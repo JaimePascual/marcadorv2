@@ -7,13 +7,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<link rel="icon" type="image/png" sizes="512x512" href="volleyball-icon.png">
-<link rel="apple-touch-icon" href="volleyball-icon.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Marcador Voley">
-
 <style>
 
 html,body{
@@ -52,20 +45,20 @@ user-select:none;
 
 .name{
 position:absolute;
-top:12px;
-right:60px;
-font-size:4vh;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:5vh;
 font-weight:bold;
 color:white;
+pointer-events:none;
 }
 
 .nameInput{
-font-size:4vh;
-font-weight:bold;
+font-size:5vh;
 border:none;
-background:rgba(255,255,255,0.9);
+padding:5px;
 border-radius:6px;
-padding:2px 6px;
 }
 
 .icon{
@@ -75,11 +68,11 @@ font-size:3vh;
 cursor:pointer;
 }
 
-.edit{ right:15px; }
+.edit{ right:10px; }
 .color{ right:45px; }
 
 .score{
-font-size:42vh;
+font-size:40vh;
 line-height:1;
 font-weight:bold;
 color:white;
@@ -95,6 +88,25 @@ border:none;
 border-radius:6px;
 background:rgba(0,0,0,0.5);
 color:white;
+}
+
+.sets{
+position:absolute;
+bottom:10px;
+display:flex;
+gap:10px;
+}
+
+.set{
+width:25px;
+height:25px;
+border-radius:50%;
+border:3px solid black;
+background:transparent;
+}
+
+.set.active{
+background:white;
 }
 
 .controls{
@@ -120,14 +132,12 @@ gap:6px;
 background:white;
 padding:8px;
 border-radius:8px;
-box-shadow:0 0 8px rgba(0,0,0,0.3);
 }
 
 .colorBox{
 width:30px;
 height:30px;
 border-radius:4px;
-cursor:pointer;
 }
 
 </style>
@@ -148,6 +158,8 @@ cursor:pointer;
 
 <div class="score" id="scoreA">0</div>
 
+<div class="sets" id="setsA"></div>
+
 </div>
 
 <div class="team bottom" id="teamB">
@@ -160,6 +172,8 @@ cursor:pointer;
 <div class="name" id="nameB">Rival</div>
 
 <div class="score" id="scoreB">0</div>
+
+<div class="sets" id="setsB"></div>
 
 </div>
 
@@ -175,7 +189,7 @@ cursor:pointer;
 let scoreA = parseInt(localStorage.getItem('scoreA')) || 0
 let scoreB = parseInt(localStorage.getItem('scoreB')) || 0
 
-let colors = [
+let colors=[
 "#e53935","#1e88e5","#43a047","#fdd835",
 "#8e24aa","#fb8c00","#00acc1","#546e7a"
 ]
@@ -222,19 +236,23 @@ removePoint("B")
 })
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
+
 if(confirm("¿Reiniciar marcador?")){
 scoreA=0
 scoreB=0
 update()
 }
+
 })
 
 function toggleFullscreen(){
+
 if(!document.fullscreenElement){
 document.documentElement.requestFullscreen()
 }else{
 document.exitFullscreen()
 }
+
 }
 
 function editName(team,e){
@@ -274,8 +292,8 @@ function togglePalette(team,e){
 
 e.stopPropagation()
 
-let existing=document.querySelector(".palette")
-if(existing) existing.remove()
+let old=document.querySelector(".palette")
+if(old) old.remove()
 
 let palette=document.createElement("div")
 palette.className="palette"
@@ -305,6 +323,37 @@ document.getElementById("team"+team).appendChild(palette)
 
 }
 
+function createSets(team){
+
+let container=document.getElementById("sets"+team)
+
+for(let i=0;i<5;i++){
+
+let s=document.createElement("div")
+s.className="set"
+
+if(localStorage.getItem("set"+team+i)==="1")
+s.classList.add("active")
+
+s.onclick=(e)=>{
+
+e.stopPropagation()
+
+s.classList.toggle("active")
+
+localStorage.setItem(
+"set"+team+i,
+s.classList.contains("active")?"1":"0"
+)
+
+}
+
+container.appendChild(s)
+
+}
+
+}
+
 function loadSettings(){
 
 let nameA=localStorage.getItem("teamAName")
@@ -320,6 +369,9 @@ if(colorA) document.getElementById("teamA").style.background=colorA
 if(colorB) document.getElementById("teamB").style.background=colorB
 
 }
+
+createSets("A")
+createSets("B")
 
 loadSettings()
 update()
