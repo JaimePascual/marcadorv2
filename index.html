@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Marcador Voley San José</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="icon" type="image/png" sizes="512x512" href="volleyball-icon.png">
+<link rel="apple-touch-icon" href="volleyball-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Marcador Voley">
+
+</head>
+
+<style>
+
+html,body{
+margin:0;
+padding:0;
+height:100%;
+width:100%;
+background:white;
+font-family:Arial, Helvetica, sans-serif;
+touch-action:manipulation;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+display:flex;
+flex-direction:column;
+height:90vh;
+width:90vw;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.team{
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+position:relative;
+user-select:none;
+}
+
+.top{background:#e53935;}
+.bottom{background:#1e88e5;}
+
+.name{
+position:absolute;
+top:12px;
+right:15px;
+font-size:4vh;
+font-weight:bold;
+color:white;
+}
+
+.score{
+font-size:42vh;
+line-height:1;
+font-weight:bold;
+color:white;
+}
+
+.minus{
+position:absolute;
+top:10px;
+left:10px;
+font-size:2.5vh;
+padding:8px 12px;
+border:none;
+border-radius:6px;
+background:rgba(0,0,0,0.5);
+color:white;
+}
+
+.controls{
+position:fixed;
+bottom:20px;
+right:20px;
+display:flex;
+gap:10px;
+}
+
+.controlButton{
+font-size:18px;
+padding:8px 12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="team top" id="teamA">
+<button class="minus" id="minusA">-1</button>
+<div class="name">San José</div>
+<div class="score" id="scoreA">0</div>
+</div>
+
+<div class="team bottom" id="teamB">
+<button class="minus" id="minusB">-1</button>
+<div class="name">Rival</div>
+<div class="score" id="scoreB">0</div>
+</div>
+
+</div>
+
+<div class="controls">
+<button class="controlButton" id="resetBtn">⟲</button>
+<button class="controlButton" onclick="toggleFullscreen()">⛶</button>
+</div>
+
+<script>
+
+let scoreA = parseInt(localStorage.getItem('scoreA')) || 0
+let scoreB = parseInt(localStorage.getItem('scoreB')) || 0
+
+function update(){
+
+scoreA=Math.max(0,scoreA)
+scoreB=Math.max(0,scoreB)
+
+document.getElementById("scoreA").textContent=scoreA
+document.getElementById("scoreB").textContent=scoreB
+
+localStorage.setItem("scoreA",scoreA)
+localStorage.setItem("scoreB",scoreB)
+
+}
+
+function addPoint(team){
+if(team==="A") scoreA++
+if(team==="B") scoreB++
+update()
+}
+
+function removePoint(team){
+if(team==="A") scoreA--
+if(team==="B") scoreB--
+update()
+}
+
+document.getElementById("teamA").addEventListener("click",()=>addPoint("A"))
+document.getElementById("teamB").addEventListener("click",()=>addPoint("B"))
+
+document.getElementById("minusA").addEventListener("click",(e)=>{
+e.stopPropagation()
+removePoint("A")
+})
+
+document.getElementById("minusB").addEventListener("click",(e)=>{
+e.stopPropagation()
+removePoint("B")
+})
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+
+if(confirm("¿Reiniciar marcador?")){
+scoreA=0
+scoreB=0
+update()
+}
+
+})
+
+function toggleFullscreen(){
+
+if(!document.fullscreenElement){
+document.documentElement.requestFullscreen()
+}else{
+document.exitFullscreen()
+}
+
+}
+
+update()
+
+</script>
+
+</body>
+</html>
